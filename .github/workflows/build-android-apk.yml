@@ -77,6 +77,18 @@ jobs:
       - name: Sync web assets and plugins into Android project
         run: pnpm exec cap sync android
 
+      # Sign every build with the SAME debug key. Otherwise each CI run generates
+      # a random debug keystore, and Android then refuses to install a new APK
+      # over a previously installed one (INSTALL_FAILED_UPDATE_INCOMPATIBLE /
+      # signature mismatch), forcing an uninstall that wipes the app's data.
+      # A debug keystore is NOT a secret — it uses the well-known public debug
+      # credentials — so it is safe to commit and place at the default location
+      # that Gradle's debug signingConfig reads (~/.android/debug.keystore).
+      - name: Use a stable debug signing key
+        run: |
+          mkdir -p ~/.android
+          cp ci/debug.keystore ~/.android/debug.keystore
+
       - name: Build debug APK
         run: |
           cd android
