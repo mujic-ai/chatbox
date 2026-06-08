@@ -11,6 +11,43 @@ export interface OAuthProviderInfo {
   flowType: 'callback' | 'code-paste' | 'device-code'
 }
 
+/**
+ * IPC channel names for the (desktop-only) OAuth flows. The matching main-process
+ * handlers are not part of the open-source edition, so these channels are never
+ * answered — `useOAuth` only invokes them on desktop and swallows failures.
+ */
+export const OAuthIpcChannels = {
+  CANCEL: 'oauth:cancel',
+  LOGIN: 'oauth:login',
+  START_LOGIN: 'oauth:start-login',
+  EXCHANGE_CODE: 'oauth:exchange-code',
+  START_DEVICE_FLOW: 'oauth:start-device-flow',
+  WAIT_DEVICE_TOKEN: 'oauth:wait-device-token',
+  REFRESH: 'oauth:refresh',
+} as const
+
+export interface OAuthResult {
+  success: boolean
+  error?: string
+  credentials?: ProviderSettings['oauth']
+}
+
+export interface OAuthStartResult {
+  success: boolean
+  error?: string
+  url?: string
+}
+
+export interface DeviceFlowStartResult {
+  success: boolean
+  error?: string
+  userCode?: string
+  verificationUri?: string
+  verificationUriComplete?: string
+  expiresIn?: number
+  interval?: number
+}
+
 export function mergeSharedOAuthProviderSettings(
   providerId: string,
   providers: Record<string, ProviderSettings> | undefined
