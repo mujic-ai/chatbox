@@ -49,7 +49,10 @@ import { initSettingsStore } from './stores/settingsStore'
 import('./setup/token_estimation_init')
 
 // 引入移动端安全区域代码，主要为了解决异形屏幕的问题
-if (CHATBOX_BUILD_TARGET === 'mobile_app' && CHATBOX_BUILD_PLATFORM === 'ios') {
+// 引入移动端安全区域代码，主要为了解决异形屏幕的问题。
+// Android 也需要：targetSdk 35 起 Android 15 强制 edge-to-edge，WebView 会绘制到
+// 状态栏/导航栏之下，必须靠安全区插件设置 --mobile-safe-area-inset-* 让 .App 留出顶部间距。
+if (CHATBOX_BUILD_TARGET === 'mobile_app') {
   import('./setup/mobile_safe_area')
 }
 
