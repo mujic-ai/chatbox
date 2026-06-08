@@ -1,0 +1,86 @@
+name: Build Android APK
+
+# Builds a debug Android APK via Capacitor.
+#
+# Why CI: the Capacitor Android project and the Android SDK / Android Gradle
+# Plugin are fetched from Google (dl.google.com), which the Claude Code web
+# sandbox blocks. A GitHub-hosted runner can reach Google and install the SDK,
+# so the APK is produced here and uploaded as a downloadable artifact.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - claude/zen-allen-ljuP5
+    paths:
+      - '.github/workflows/build-android-apk.yml'
+      - 'capacitor.config.ts'
+
+permissions:
+  contents: read
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Setup Java (JDK 21)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install required Android SDK packages
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+      # --ignore-scripts skips the release/app Electron native rebuild, which is
+      # irrelevant for (and the most fragile part of) a Capacitor mobile build.
+      # Patched dependencies are still applied (pnpm applies patches in core),
+      # and platform binaries (esbuild, etc.) come via optionalDependencies.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Build mobile web bundle (Android target)
+        env:
+          CHATBOX_BUILD_TARGET: mobile_app
+          CHATBOX_BUILD_PLATFORM: android
+        run: |
+          pnpm exec electron-vite build
+          pnpm run delete-sourcemaps || true
+
+      - name: Scaffold Capacitor Android project
+        run: pnpm exec cap add android
+
+      - name: Sync web assets and plugins into Android project
+        run: pnpm exec cap sync android
+
+      - name: Build debug APK
+        run: |
+          cd android
+          chmod +x ./gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chatbox-android-debug-apk
+          path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 14
