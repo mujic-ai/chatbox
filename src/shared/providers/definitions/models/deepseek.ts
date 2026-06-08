@@ -36,7 +36,7 @@ export default class DeepSeek extends AbstractAISDKModel {
     return provider.chat(this.options.model.modelId)
   }
 
-  protected getCallSettings(_options: CallChatCompletionOptions): CallSettings {
+  protected getCallSettings(options: CallChatCompletionOptions): CallSettings {
     const isReasonerModel = this.options.model.modelId === 'deepseek-reasoner'
     const settings: CallSettings = {
       maxOutputTokens: this.options.maxOutputTokens,
@@ -48,14 +48,27 @@ export default class DeepSeek extends AbstractAISDKModel {
       settings.topP = this.options.topP
     }
 
-    // Enable thinking for reasoner model
+    // Thinking configuration for reasoner models.
+    // `reasoningEffort` lets the user tune thinking intensity:
+    //   - 'disabled' turns thinking off
+    //   - 'high' / 'max' are forwarded to the DeepSeek API as `reasoning_effort`
+    //   - undefined keeps the previous default (thinking enabled, server-default high effort)
     if (this.isSupportReasoning()) {
-      settings.providerOptions = {
-        deepseek: {
-          thinking: {
-            type: 'enabled',
-          },
-        } satisfies DeepSeekChatOptions,
+      const reasoningEffort = options.providerOptions?.deepseek?.reasoningEffort
+
+      if (reasoningEffort === 'disabled') {
+        settings.providerOptions = {
+          deepseek: {
+            thinking: { type: 'disabled' },
+          } satisfies DeepSeekChatOptions,
+        }
+      } else {
+        settings.providerOptions = {
+          deepseek: {
+            thinking: { type: 'enabled' },
+            ...(reasoningEffort ? { reasoning_effort: reasoningEffort } : {}),
+          } satisfies DeepSeekChatOptions,
+        }
       }
     }
 

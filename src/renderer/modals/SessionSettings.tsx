@@ -670,6 +670,71 @@ function OpenAIProviderConfig({
   )
 }
 
+function DeepSeekProviderConfig({
+  settings,
+  onSettingsChange,
+}: {
+  settings: SessionSettings
+  onSettingsChange: (data: Session['settings']) => void
+}) {
+  const { t } = useTranslation()
+  const providerOptions = settings?.providerOptions?.deepseek
+
+  // DeepSeek reasoner models think with "high" effort by default, so an unset
+  // value is presented (and behaves) as "high".
+  const reasoningEffortOptions = useMemo(
+    () => [
+      { label: t('Disabled'), value: 'disabled' },
+      { label: t('High'), value: 'high' },
+      { label: t('Max'), value: 'max' },
+    ],
+    [t]
+  )
+
+  const handleReasoningEffortChange = useCallback(
+    (value: string) => {
+      const reasoningEffort = value as 'disabled' | 'high' | 'max'
+      onSettingsChange({
+        providerOptions: {
+          deepseek: { reasoningEffort },
+        },
+      })
+    },
+    [onSettingsChange]
+  )
+
+  const currentValue = useMemo(() => {
+    return providerOptions?.reasoningEffort ?? 'high'
+  }, [providerOptions?.reasoningEffort])
+
+  return (
+    <Stack gap="md">
+      <Flex align="center" gap="xs">
+        <Text size="sm" fw="600">
+          {t('Thinking Effort')}
+        </Text>
+        <Tooltip
+          label={t('Thinking Effort only works for DeepSeek reasoner models')}
+          withArrow={true}
+          maw={320}
+          className="!whitespace-normal"
+          zIndex={3000}
+          events={{ hover: true, focus: true, touch: true }}
+        >
+          <ScalableIcon icon={IconInfoCircle} size={20} className="text-chatbox-tint-tertiary" />
+        </Tooltip>
+      </Flex>
+
+      <SegmentedControl
+        key="deepseek-reasoning-effort-control"
+        value={currentValue}
+        onChange={handleReasoningEffortChange}
+        data={reasoningEffortOptions}
+      />
+    </Stack>
+  )
+}
+
 function GoogleProviderConfig({
   settings,
   onSettingsChange,
@@ -853,6 +918,9 @@ export function ChatConfig({
       )}
       {settings?.provider === ModelProviderEnum.OpenAI && (
         <OpenAIProviderConfig settings={settings} onSettingsChange={onSettingsChange} />
+      )}
+      {settings?.provider === ModelProviderEnum.DeepSeek && (
+        <DeepSeekProviderConfig settings={settings} onSettingsChange={onSettingsChange} />
       )}
       {settings?.provider === ModelProviderEnum.Gemini && (
         <GoogleProviderConfig settings={settings} onSettingsChange={onSettingsChange} />

@@ -126,10 +126,18 @@ const GoogleParamsSchema = z.object({
   }),
 })
 
+const DeepSeekParamsSchema = z.object({
+  // Thinking intensity for DeepSeek reasoner models.
+  // `disabled` turns thinking off; `high`/`max` map to the DeepSeek API `reasoning_effort`.
+  // `undefined` keeps the default behavior (thinking enabled, server-default high effort).
+  reasoningEffort: z.enum(['disabled', 'high', 'max']).optional().catch(undefined),
+})
+
 export const ProviderOptionsSchema = z.object({
   claude: ClaudeParamsSchema.optional(),
   openai: OpenAIParamsSchema.optional(),
   google: GoogleParamsSchema.optional(),
+  deepseek: DeepSeekParamsSchema.optional(),
 })
 
 // NOTICE: Global settings is for new session default settings, set to session when session created, changes will not affect existing sessions

@@ -12,7 +12,7 @@ overrides:
 
 patchedDependencies:
   '@ai-sdk/deepseek@2.0.17':
-    hash: 38ca8fe1e6bf5a471413f4cbe6d1fe49d0cd4e74e9494fe802c3a7036497eb41
+    hash: daa5169eee9fd9869099398cb7b61e0f24795d84e63d81509d217c1649a7fcfc
     path: patches/@ai-sdk__deepseek@2.0.17.patch
   libsql@0.5.22:
     hash: 1cd6cac4cce1855ac60c054495f98b9ba467098185ea666dff300e0245a4c75f
@@ -115,7 +115,7 @@ importers:
         version: 3.0.26(zod@4.3.6)
       '@ai-sdk/deepseek':
         specifier: ^2.0.3
-        version: 2.0.17(patch_hash=38ca8fe1e6bf5a471413f4cbe6d1fe49d0cd4e74e9494fe802c3a7036497eb41)(zod@4.3.6)
+        version: 2.0.17(patch_hash=daa5169eee9fd9869099398cb7b61e0f24795d84e63d81509d217c1649a7fcfc)(zod@4.3.6)
       '@ai-sdk/google':
         specifier: ^3.0.3
         version: 3.0.20(zod@4.3.6)
@@ -13523,7 +13523,7 @@ snapshots:
       '@ai-sdk/provider-utils': 4.0.13(zod@4.3.6)
       zod: 4.3.6
 
-  '@ai-sdk/deepseek@2.0.17(patch_hash=38ca8fe1e6bf5a471413f4cbe6d1fe49d0cd4e74e9494fe802c3a7036497eb41)(zod@4.3.6)':
+  '@ai-sdk/deepseek@2.0.17(patch_hash=daa5169eee9fd9869099398cb7b61e0f24795d84e63d81509d217c1649a7fcfc)(zod@4.3.6)':
     dependencies:
       '@ai-sdk/provider': 3.0.7
       '@ai-sdk/provider-utils': 4.0.13(zod@4.3.6)

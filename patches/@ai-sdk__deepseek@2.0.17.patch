@@ -1,5 +1,23 @@
+diff --git a/dist/index.d.ts b/dist/index.d.ts
+index c5ac01e8edd44917c57240a42892843589e2e29e..72aaf2ed547c51811e6fc47aa3a87120c2893017 100644
+--- a/dist/index.d.ts
++++ b/dist/index.d.ts
+@@ -10,6 +10,13 @@ declare const deepseekChatOptions: z.ZodObject<{
+             disabled: "disabled";
+         }>>;
+     }, z.core.$strip>>;
++    reasoning_effort: z.ZodOptional<z.ZodEnum<{
++        low: "low";
++        medium: "medium";
++        high: "high";
++        xhigh: "xhigh";
++        max: "max";
++    }>>;
+ }, z.core.$strip>;
+ type DeepSeekChatOptions = z.infer<typeof deepseekChatOptions>;
+ 
 diff --git a/dist/index.js b/dist/index.js
-index cb422ca7fcb77592cc66e43bd7ab526f0119afea..34380442ee86173839c759aac5dd3b694935c000 100644
+index cb422ca7fcb77592cc66e43bd7ab526f0119afea..cc88f7abea9ece07e2164a2cbd992d75ffcb7dbd 100644
 --- a/dist/index.js
 +++ b/dist/index.js
 @@ -37,9 +37,11 @@ var import_provider_utils2 = require("@ai-sdk/provider-utils");
@@ -33,7 +51,21 @@ index cb422ca7fcb77592cc66e43bd7ab526f0119afea..34380442ee86173839c759aac5dd3b69
            tool_calls: toolCalls.length > 0 ? toolCalls : void 0
          });
          break;
-@@ -441,7 +443,8 @@ var DeepSeekChatLanguageModel = class {
+@@ -303,7 +305,12 @@ var deepseekChatOptions = import_v42.z.object({
+    */
+   thinking: import_v42.z.object({
+     type: import_v42.z.enum(["enabled", "disabled"]).optional()
+-  }).optional()
++  }).optional(),
++  /**
++   * Reasoning effort controlling thinking intensity for reasoning models.
++   * Passed through to the DeepSeek API as `reasoning_effort`.
++   */
++  reasoning_effort: import_v42.z.enum(["low", "medium", "high", "xhigh", "max"]).optional()
+ });
+ 
+ // src/chat/deepseek-prepare-tools.ts
+@@ -441,7 +448,8 @@ var DeepSeekChatLanguageModel = class {
      })) != null ? _a : {};
      const { messages, warnings } = convertToDeepSeekChatMessages({
        prompt,
@@ -43,8 +75,18 @@ index cb422ca7fcb77592cc66e43bd7ab526f0119afea..34380442ee86173839c759aac5dd3b69
      });
      if (topK != null) {
        warnings.push({ type: "unsupported", feature: "topK" });
+@@ -470,7 +478,8 @@ var DeepSeekChatLanguageModel = class {
+         messages,
+         tools: deepseekTools,
+         tool_choice: deepseekToolChoices,
+-        thinking: ((_b = deepseekOptions.thinking) == null ? void 0 : _b.type) != null ? { type: deepseekOptions.thinking.type } : void 0
++        thinking: ((_b = deepseekOptions.thinking) == null ? void 0 : _b.type) != null ? { type: deepseekOptions.thinking.type } : void 0,
++        reasoning_effort: deepseekOptions.reasoning_effort
+       },
+       warnings: [...warnings, ...toolWarnings]
+     };
 diff --git a/dist/index.mjs b/dist/index.mjs
-index 291e915aa210df10946a6a83985c9a522f55cb8c..b28b83090f6039d16fc60af7ec51490af87d8dc5 100644
+index 291e915aa210df10946a6a83985c9a522f55cb8c..60b54418d2c45304013bd886b368f2f594c9915b 100644
 --- a/dist/index.mjs
 +++ b/dist/index.mjs
 @@ -26,9 +26,11 @@ import {
@@ -78,7 +120,21 @@ index 291e915aa210df10946a6a83985c9a522f55cb8c..b28b83090f6039d16fc60af7ec51490a
            tool_calls: toolCalls.length > 0 ? toolCalls : void 0
          });
          break;
-@@ -430,7 +432,8 @@ var DeepSeekChatLanguageModel = class {
+@@ -292,7 +294,12 @@ var deepseekChatOptions = z2.object({
+    */
+   thinking: z2.object({
+     type: z2.enum(["enabled", "disabled"]).optional()
+-  }).optional()
++  }).optional(),
++  /**
++   * Reasoning effort controlling thinking intensity for reasoning models.
++   * Passed through to the DeepSeek API as `reasoning_effort`.
++   */
++  reasoning_effort: z2.enum(["low", "medium", "high", "xhigh", "max"]).optional()
+ });
+ 
+ // src/chat/deepseek-prepare-tools.ts
+@@ -430,7 +437,8 @@ var DeepSeekChatLanguageModel = class {
      })) != null ? _a : {};
      const { messages, warnings } = convertToDeepSeekChatMessages({
        prompt,
@@ -88,3 +144,13 @@ index 291e915aa210df10946a6a83985c9a522f55cb8c..b28b83090f6039d16fc60af7ec51490a
      });
      if (topK != null) {
        warnings.push({ type: "unsupported", feature: "topK" });
+@@ -459,7 +467,8 @@ var DeepSeekChatLanguageModel = class {
+         messages,
+         tools: deepseekTools,
+         tool_choice: deepseekToolChoices,
+-        thinking: ((_b = deepseekOptions.thinking) == null ? void 0 : _b.type) != null ? { type: deepseekOptions.thinking.type } : void 0
++        thinking: ((_b = deepseekOptions.thinking) == null ? void 0 : _b.type) != null ? { type: deepseekOptions.thinking.type } : void 0,
++        reasoning_effort: deepseekOptions.reasoning_effort
+       },
+       warnings: [...warnings, ...toolWarnings]
+     };
