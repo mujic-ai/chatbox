@@ -12,9 +12,15 @@ on:
   push:
     branches:
       - claude/zen-allen-ljuP5
+    # Rebuild the APK when the app sources or build config change on this branch.
     paths:
       - '.github/workflows/build-android-apk.yml'
       - 'capacitor.config.ts'
+      - 'src/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'electron.vite.config.ts'
+      - 'patches/**'
 
 permissions:
   contents: read
